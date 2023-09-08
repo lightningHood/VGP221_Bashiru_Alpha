@@ -17,6 +17,10 @@ AFPSProjectile::AFPSProjectile()
     {
         // Use a sphere as a simple collision representation.
         CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
+        // Set the sphere's collision profile name to "Projectile".
+        CollisionComponent->BodyInstance.SetCollisionProfileName(TEXT("Projectile"));
+        // Event called when component hits something.
+        CollisionComponent->OnComponentHit.AddDynamic(this, &AFPSProjectile::OnHit);
         // Set the sphere's collision radius.
         CollisionComponent->InitSphereRadius(15.0f);
         // Set the root component to be the collision component.
@@ -54,6 +58,9 @@ AFPSProjectile::AFPSProjectile()
         ProjectileMeshComponent->SetRelativeScale3D(FVector(0.09f, 0.09f, 0.09f));
         ProjectileMeshComponent->SetupAttachment(RootComponent);
     }
+
+    // Delete the projectile after 3 seconds.
+    InitialLifeSpan = 3.0f;
 }
 
 // Called when the game starts or when spawned
@@ -74,6 +81,16 @@ void AFPSProjectile::Tick(float DeltaTime)
 void AFPSProjectile::FireInDirection(const FVector& ShootDirection)
 {
     ProjectileMovementComponent->Velocity = ShootDirection * ProjectileMovementComponent->InitialSpeed;
+}
+
+// Function that is called when the projectile hits something.
+void AFPSProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
+{
+    if (OtherActor != this && OtherComponent->IsSimulatingPhysics())
+    {
+        OtherComponent->AddImpulseAtLocation(ProjectileMovementComponent->Velocity * 100.0f, Hit.ImpactPoint);
+    }
+    Destroy();
 }
 
 
