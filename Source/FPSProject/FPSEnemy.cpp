@@ -18,13 +18,11 @@ AFPSEnemy::AFPSEnemy()
 	MySphereComponent->SetCollisionProfileName(TEXT("Trigger"));
 	RootComponent = MySphereComponent;
 
-	MyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("My MESH"));
+	MyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MY MESH"));
 	MyMesh->SetupAttachment(RootComponent);
 
-	MyCollisionSphere->OnComponentBeginOve.AddDynamic(this, &AFPSEnemy::OnOverlapBegin);
 
-	
-
+	MySphereComponent->OnComponentBeginOverlap.AddDynamic(this, &AFPSEnemy::OnOverlapBegin);
 }
 
 // Called when the game starts or when spawned
@@ -39,16 +37,12 @@ void AFPSEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	DrawDebugSpher(GetWorld(), GetActorLocation(), SphereRadius, 20, FColor::Purple, false, -1, 0, 1)
 
-		void AFPSEnenmy::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor,
-			class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult) 
-	{
-		if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr)) 
-		{
-			Destroy();
-		}
-	}
 
 }
 
+void AFPSEnemy::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor,
+	class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	Destroy();
+}
